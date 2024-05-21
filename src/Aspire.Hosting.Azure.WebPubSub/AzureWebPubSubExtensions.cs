@@ -9,6 +9,7 @@ using Aspire.Hosting.Azure;
 using Azure.Provisioning;
 
 using Azure.Provisioning.WebPubSub;
+using Azure.ResourceManager.WebPubSub.Models;
 
 namespace Aspire.Hosting;
 
@@ -62,6 +63,14 @@ public static class AzureWebPubSubExtensions
 
             var resource = (AzureWebPubSubResource)construct.Resource;
             var resourceBuilder = builder.CreateResourceBuilder(resource);
+
+            foreach (var hub in resource.HubSettings)
+            {
+                var properties = new WebPubSubHubProperties();
+                var hubSettings = new WebPubSubHub(construct, properties, name: hub.Name, parent: service);
+                hub.Configure?.Invoke(resourceBuilder, construct, hubSettings);
+            }
+
             configureResource?.Invoke(resourceBuilder, construct, service);
         };
 
@@ -71,5 +80,33 @@ public static class AzureWebPubSubExtensions
                       .WithParameter(AzureBicepResource.KnownParameters.PrincipalId)
                       .WithParameter(AzureBicepResource.KnownParameters.PrincipalType)
                       .WithManifestPublishingCallback(resource.WriteToManifest);
+    }
+
+    /// <summary>
+    /// Adds an Azure Web PubSub Hub setting resource to the application model. This resource requires an <see cref="AzureWebPubSubResource"/> to be added to the application model.
+    /// </summary>
+    /// <param name="builder">The Azure Web PubSub resource builder.</param>
+    /// <param name="name">The name of the hub.</param>
+    public static IResourceBuilder<AzureWebPubSubResource> AddHubSetting
+        (this IResourceBuilder<AzureWebPubSubResource> builder,
+        string name)
+    {
+#pragma warning disable AZPROVISION001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        return builder.AddHubSetting(name, null);
+#pragma warning restore AZPROVISION001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+    }
+
+    /// <summary>
+    /// Adds an Azure Web PubSub Hub setting resource to the application model. This resource requires an <see cref="AzureWebPubSubResource"/> to be added to the application model.
+    /// </summary>
+    /// <param name="builder">The Azure Web PubSub resource builder.</param>
+    /// <param name="name">The name of the hub.</param>
+    [Experimental("AZPROVISION001", UrlFormat = "https://aka.ms/dotnet/aspire/diagnostics#{0}")]
+    public static IResourceBuilder<AzureWebPubSubResource> AddHubSetting
+        (this IResourceBuilder<AzureWebPubSubResource> builder, string name, Action<IResourceBuilder<AzureWebPubSubResource>, ResourceModuleConstruct, WebPubSubHub>? configureHubSettings)
+    {
+        builder.Resource.HubSettings.Add((name, configureHubSettings));
+        return builder;
     }
 }
