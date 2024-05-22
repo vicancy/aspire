@@ -83,7 +83,7 @@ public static class AspireWebPubSubExtensions
                 return !string.IsNullOrEmpty(connectionString) ?
                     new WebPubSubServiceClient(connectionString, hubName, options) :
                     new WebPubSubServiceClient(settings.Endpoint!, hubName, cred, options);
-            }, requiresCredential: false);
+            }, requiresCredential: false).WithName(hubName);
         }
 
         protected override IHealthCheck CreateHealthCheck(WebPubSubServiceClient client, AzureMessagingWebPubSubSettings settings)

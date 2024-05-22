@@ -1,8 +1,11 @@
 using Azure.Messaging.WebPubSub;
 
+using Microsoft.Extensions.Azure;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddAzureWebPubSubHub("wps1", "chatForAspire");
+builder.AddAzureWebPubSubHub("wps1", "chatHub");
+builder.AddAzureWebPubSubHub("wps1", "notificationHub");
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -27,9 +30,22 @@ app.UseAuthorization();
 app.MapRazorPages();
 
 // return the Client Access URL with negotiate endpoint
-app.MapGet("/negotiate", (WebPubSubServiceClient service) =>
-new
+app.MapGet("/negotiate/chat", (IAzureClientFactory<WebPubSubServiceClient> clientFactory) =>
 {
-    url = service.GetClientAccessUri(roles: ["webpubsub.sendToGroup.group1", "webpubsub.joinLeaveGroup.group1"]).AbsoluteUri
+    var service = clientFactory.CreateClient("chatHub");
+    return
+        new
+        {
+            url = service.GetClientAccessUri(roles: ["webpubsub.sendToGroup.group1", "webpubsub.joinLeaveGroup.group1"]).AbsoluteUri
+        };
+});
+app.MapGet("/negotiate/notification", (IAzureClientFactory<WebPubSubServiceClient> clientFactory) =>
+{
+    var service = clientFactory.CreateClient("notificationHub");
+    return
+        new
+        {
+            url = service.GetClientAccessUri(roles: ["webpubsub.sendToGroup.group1", "webpubsub.joinLeaveGroup.group1"]).AbsoluteUri
+        };
 });
 app.Run();

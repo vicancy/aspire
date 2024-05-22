@@ -19,12 +19,28 @@ public static class AzureWebPubSubExtensions
 {
     /// <summary>
     /// Adds an Azure Web PubSub resource to the application model.
-    /// Change sku: WithParameter("sku", "Standard_S1")
-    /// Change capacity: WithParameter("capacity", 2)
     /// </summary>
     /// <param name="builder">The <see cref="IDistributedApplicationBuilder"/>.</param>
     /// <param name="name">The name of the resource. This name will be used as the connection string name when referenced in a dependency.</param>
     /// <returns>A reference to the <see cref="IResourceBuilder{T}"/>.</returns>
+    /// <remarks>
+    /// <para>
+    /// Change sku with <code>.WithParameter("sku", "Standard_S1")</code>
+    /// Change capacity with <code>.WithParameter("capacity", 2)</code>
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// To create a Standard tier with unit 2
+    /// <code>
+    /// builder.AddAzureWebPubSub("wps1").WithParameter("sku", "Standard_S1").WithParameter("capacity", 2);
+    /// </code>
+    /// </example>
+    /// <example>
+    /// To create a Premium tier with unit 100
+    /// <code>
+    /// builder.AddAzureWebPubSub("wps1").WithParameter("sku", "Premium_P1").WithParameter("capacity", 100);
+    /// </code>
+    /// </example>
     public static IResourceBuilder<AzureWebPubSubResource> AddAzureWebPubSub(this IDistributedApplicationBuilder builder, string name)
     {
 #pragma warning disable AZPROVISION001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
@@ -40,6 +56,24 @@ public static class AzureWebPubSubExtensions
     /// <param name="name">The name of the resource.</param>
     /// <param name="configureResource">Callback to configure the underlying <see cref="global::Azure.Provisioning.WebPubSub.WebPubSubService"/> resource.</param>
     /// <returns></returns>
+    /// <remarks>
+    /// <para>
+    /// Change sku with <code>.WithParameter("sku", "Standard_S1")</code>
+    /// Change capacity with <code>.WithParameter("capacity", 2)</code>
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// To create a Standard tier with unit 2
+    /// <code>
+    /// builder.AddAzureWebPubSub("wps1").WithParameter("sku", "Standard_S1").WithParameter("capacity", 2);
+    /// </code>
+    /// </example>
+    /// <example>
+    /// To create a Premium tier with unit 100
+    /// <code>
+    /// builder.AddAzureWebPubSub("wps1").WithParameter("sku", "Premium_P1").WithParameter("capacity", 100);
+    /// </code>
+    /// </example>
     [Experimental("AZPROVISION001", UrlFormat = "https://aka.ms/dotnet/aspire/diagnostics#{0}")]
     public static IResourceBuilder<AzureWebPubSubResource> AddAzureWebPubSub(this IDistributedApplicationBuilder builder, string name, Action<IResourceBuilder<AzureWebPubSubResource>, ResourceModuleConstruct, WebPubSubService>? configureResource)
     {
